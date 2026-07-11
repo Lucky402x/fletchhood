@@ -1,0 +1,1213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FLETCHHOOD &mdash; The Memecoin for the Next Generation of Traders</title>
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 100%; background: #050505; overflow-x: hidden; scrollbar-width: none; }
+  html::-webkit-scrollbar, body::-webkit-scrollbar { display: none; }
+  canvas#bg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; z-index: 0; }
+
+  /* ─── Hero section ─── */
+  #hero { position: relative; width: 100%; height: 100vh; }
+
+  .hud { position: absolute; inset: 0; pointer-events: none; z-index: 1; }
+
+  /* ─── Content sections (below hero) ─── */
+  #content { position: relative; z-index: 2; background: #050505; }
+
+  /* ─── Corner brackets ─── */
+  .corner {
+    position: absolute;
+    width: 72px;
+    height: 72px;
+  }
+  .corner svg { width: 100%; height: 100%; }
+  .c-tl { top: 28px; left: 28px; }
+  .c-tr { top: 28px; right: 28px; }
+  .c-bl { bottom: 28px; left: 28px; }
+  .c-br { bottom: 28px; right: 28px; }
+
+  /* ─── Top center ─── */
+  .hud-top {
+    position: absolute;
+    top: 22px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .hud-top-line {
+    width: 36px;
+    height: 1px;
+    background: linear-gradient(to right, transparent, rgba(198,255,0,0.4));
+  }
+  .hud-top-line.r { background: linear-gradient(to left, transparent, rgba(198,255,0,0.4)); }
+  .hud-top-text {
+    font-family: 'Courier New', monospace;
+    font-size: 8.5px;
+    letter-spacing: 0.22em;
+    color: rgba(198,255,0,0.45);
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .hud-dot {
+    width: 3px; height: 3px;
+    border-radius: 50%;
+    background: #C6FF00;
+    animation: blink 2.4s ease-in-out infinite;
+  }
+  .hud-dot:nth-child(3) { animation-delay: 1.2s; }
+
+/* ─── Bottom center ─── */
+  .hud-bot {
+    position: absolute;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    opacity: 0.28;
+  }
+  .hud-bot span {
+    font-family: 'Courier New', monospace;
+    font-size: 7.5px;
+    letter-spacing: 0.18em;
+    color: rgba(198,255,0,0.9);
+    white-space: nowrap;
+  }
+  .tick { width: 28px; height: 1px; background: rgba(198,255,0,0.5); }
+
+  /* ─── Side data strips ─── */
+  .side-strip {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    opacity: 0.18;
+  }
+  .side-strip.l { left: 22px; align-items: flex-start; }
+  .side-strip.r { right: 22px; align-items: flex-end; }
+  .side-strip span {
+    font-family: 'Courier New', monospace;
+    font-size: 7px;
+    letter-spacing: 0.16em;
+    color: rgba(198,255,0,0.8);
+    white-space: nowrap;
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+  }
+  .side-strip.l span { transform: rotate(180deg); }
+
+  /* ─── Hero title ─── */
+  .hero-title {
+    position: absolute;
+    top: 22%;
+    width: 100%;
+    text-align: center;
+    pointer-events: none;
+    user-select: none;
+  }
+  .hero-title h1 {
+    font-family: 'Courier New', monospace;
+    font-size: clamp(32px, 5vw, 72px);
+    font-weight: 700;
+    letter-spacing: 0.20em;
+    text-transform: uppercase;
+    color: #ffffff;
+    text-shadow:
+      0 0 40px rgba(198,255,0,0.35),
+      0 0 80px rgba(198,255,0,0.15),
+      0 2px 4px rgba(0,0,0,0.8);
+    white-space: nowrap;
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 0.25; }
+    50% { opacity: 1; }
+  }
+  @keyframes breathe {
+    0%, 100% { opacity: 0.22; }
+    50% { opacity: 0.38; }
+  }
+
+  .corner { animation: breathe 4s ease-in-out infinite; }
+  .c-tr { animation-delay: 1s; }
+  .c-bl { animation-delay: 2s; }
+  .c-br { animation-delay: 3s; }
+
+  /* ─── Twitter/X button ─── */
+  .twitter-btn {
+    position: fixed;
+    top: 22px;
+    right: 72px;
+    z-index: 100;
+    pointer-events: all;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 5px 9px;
+    border: 1px solid rgba(198,255,0,0.3);
+    background: rgba(5,5,5,0.6);
+    backdrop-filter: blur(4px);
+    text-decoration: none;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .twitter-btn:hover {
+    border-color: rgba(198,255,0,0.7);
+    background: rgba(198,255,0,0.08);
+  }
+  .twitter-btn svg { width: 14px; height: 14px; fill: #C6FF00; flex-shrink: 0; }
+  .twitter-btn span {
+    font-family: 'Courier New', monospace;
+    font-size: 8px;
+    letter-spacing: 0.18em;
+    color: rgba(198,255,0,0.7);
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .twitter-btn:hover span { color: #C6FF00; }
+
+  /* ─── Telegram popup ─── */
+  .tg-popup-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 999;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(4px);
+    align-items: center;
+    justify-content: center;
+  }
+  .tg-popup-overlay.show { display: flex; }
+  .tg-popup {
+    border: 1px solid rgba(198,255,0,0.25);
+    background: rgba(5,5,5,0.92);
+    padding: 40px 56px;
+    text-align: center;
+  }
+  .tg-popup-title {
+    font-family: 'Courier New', monospace;
+    font-size: 22px;
+    font-weight: 900;
+    color: #C6FF00;
+    letter-spacing: 0.12em;
+    text-shadow: 0 0 30px rgba(198,255,0,0.4);
+    margin-bottom: 10px;
+  }
+  .tg-popup-sub {
+    font-family: 'Courier New', monospace;
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    color: rgba(198,255,0,0.4);
+    text-transform: uppercase;
+    margin-bottom: 28px;
+  }
+  .tg-popup-close {
+    font-family: 'Courier New', monospace;
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    color: rgba(198,255,0,0.35);
+    text-transform: uppercase;
+    background: none;
+    border: 1px solid rgba(198,255,0,0.2);
+    padding: 7px 20px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .tg-popup-close:hover { color: #C6FF00; border-color: rgba(198,255,0,0.6); }
+
+  /* ─── CA bar ─── */
+  .ca-bar {
+    position: absolute;
+    top: 58%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 12px 24px;
+    border: 1px solid rgba(198,255,0,0.12);
+    background: rgba(5,5,5,0.35);
+    backdrop-filter: blur(8px);
+    white-space: nowrap;
+    width: 70%;
+    justify-content: center;
+  }
+  .ca-label {
+    font-family: 'Courier New', monospace;
+    font-size: 8px;
+    letter-spacing: 0.28em;
+    color: rgba(198,255,0,0.4);
+    text-transform: uppercase;
+    flex-shrink: 0;
+  }
+  .ca-address {
+    font-family: 'Courier New', monospace;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    color: rgba(198,255,0,0.7);
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .ca-copy {
+    font-family: 'Courier New', monospace;
+    font-size: 8px;
+    letter-spacing: 0.18em;
+    color: rgba(198,255,0,0.3);
+    text-transform: uppercase;
+    cursor: pointer;
+    flex-shrink: 0;
+    border: 1px solid rgba(198,255,0,0.15);
+    padding: 3px 8px;
+    transition: all 0.2s;
+    background: none;
+    pointer-events: all;
+  }
+  .ca-copy:hover { color: #C6FF00; border-color: rgba(198,255,0,0.5); }
+
+  /* ─── Ticker card ─── */
+  .ticker-card {
+    position: absolute;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(5,5,5,0.08);
+    border: 1px solid rgba(198,255,0,0.06);
+    backdrop-filter: blur(12px);
+    padding: 18px 36px 20px;
+    text-align: left;
+    min-width: 220px;
+  }
+  .ticker-label-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 6px;
+    min-width: 180px;
+  }
+  .ticker-info {
+    position: relative;
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    border: 1px solid rgba(198,255,0,0.4);
+    font-family: 'Courier New', monospace;
+    font-size: 9px;
+    color: rgba(198,255,0,0.5);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    pointer-events: all;
+    flex-shrink: 0;
+  }
+  .ticker-info:hover { border-color: #C6FF00; color: #C6FF00; }
+  .ticker-tooltip {
+    display: none;
+    position: absolute;
+    bottom: calc(100% + 10px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(5,5,5,0.95);
+    border: 1px solid rgba(198,255,0,0.2);
+    padding: 12px 16px;
+    width: 220px;
+    font-family: 'Courier New', monospace;
+    font-size: 10px;
+    line-height: 1.7;
+    color: rgba(198,255,0,0.7);
+    letter-spacing: 0.04em;
+    text-align: left;
+    z-index: 10;
+    pointer-events: none;
+  }
+  .ticker-info.open .ticker-tooltip,
+  .ticker-info:hover .ticker-tooltip { display: block; }
+
+  .ticker-label {
+    font-family: 'Courier New', monospace;
+    font-size: 9px;
+    letter-spacing: 0.22em;
+    color: rgba(198,255,0,0.45);
+    text-transform: uppercase;
+  }
+  .ticker-value {
+    font-family: 'Courier New', monospace;
+    font-size: clamp(48px, 6vw, 80px);
+    font-weight: 900;
+    color: #C6FF00;
+    letter-spacing: 0.04em;
+    line-height: 1;
+    text-shadow: 0 0 30px rgba(198,255,0,0.4);
+  }
+
+  /* ─── Mobile responsive ─── */
+  @media (max-width: 768px) {
+    #about { padding: 60px 24px 60px; }
+    #community { padding: 60px 24px 80px; }
+
+    .about-grid { grid-template-columns: 1fr; gap: 40px; }
+    .community-header { grid-template-columns: 1fr; gap: 24px; margin-bottom: 40px; }
+    .community-links { grid-template-columns: 1fr; gap: 12px; }
+
+    .about-title { font-size: clamp(28px, 8vw, 48px); }
+    .community-title { font-size: clamp(28px, 8vw, 48px); }
+
+    .ca-bar { width: 90%; padding: 10px 14px; }
+    .ca-address { font-size: 9px; }
+
+    #hero { height: 540px; }
+    .ca-bar { top: 52%; width: 90%; padding: 10px 14px; }
+    .ticker-card { padding: 12px 20px 14px; bottom: 40px; }
+    .ticker-value { font-size: clamp(36px, 10vw, 60px); }
+    .c-tl, .c-tr, .c-bl, .c-br { width: 44px; height: 44px; }
+    .c-tl, .c-tr { top: 14px; }
+    .c-tl, .c-bl { left: 14px; }
+    .c-tr, .c-br { right: 14px; }
+    .c-bl, .c-br { bottom: 14px; }
+    .hud-bot { bottom: 14px; }
+
+    .hud-top-text { font-size: 6px; letter-spacing: 0.14em; }
+    .side-strip { display: none; }
+
+    .comm-card { padding: 20px 20px; }
+  }
+
+  /* ─── About section ─── */
+  #about {
+    padding: 120px 80px 100px;
+    border-top: 1px solid rgba(198,255,0,0.08);
+  }
+  .about-inner { max-width: 1200px; margin: 0 auto; }
+
+  .about-label {
+    font-family: 'Courier New', monospace;
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    color: rgba(198,255,0,0.35);
+    margin-bottom: 56px;
+  }
+
+  .about-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: start;
+  }
+
+  .about-title {
+    font-family: 'Courier New', monospace;
+    font-size: clamp(36px, 4.5vw, 72px);
+    font-weight: 400;
+    color: rgba(198,255,0,0.25);
+    line-height: 1.1;
+    margin-bottom: 32px;
+    letter-spacing: -0.01em;
+  }
+  .about-title span {
+    font-weight: 900;
+    color: #C6FF00;
+    text-shadow: 0 0 40px rgba(198,255,0,0.3);
+  }
+
+  .about-divider {
+    width: 48px;
+    height: 1px;
+    background: rgba(198,255,0,0.4);
+    margin-bottom: 32px;
+  }
+
+  .about-body {
+    font-family: 'Courier New', monospace;
+    font-size: 13px;
+    line-height: 1.85;
+    color: rgba(198,255,0,0.45);
+    margin-bottom: 20px;
+    letter-spacing: 0.02em;
+  }
+
+  .about-tagline {
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.7;
+    color: rgba(198,255,0,0.85);
+    margin-top: 36px;
+    letter-spacing: 0.04em;
+    border-left: 2px solid #C6FF00;
+    padding-left: 20px;
+  }
+
+  .about-right {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding-top: 8px;
+  }
+
+  .about-stat-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 0;
+    border-bottom: 1px solid rgba(198,255,0,0.08);
+  }
+  .stat-label {
+    font-family: 'Courier New', monospace;
+    font-size: 9px;
+    letter-spacing: 0.28em;
+    color: rgba(198,255,0,0.3);
+  }
+  .stat-value {
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    color: #C6FF00;
+  }
+
+  /* ─── Community section ─── */
+  #community {
+    padding: 100px 80px 120px;
+    border-top: 1px solid rgba(198,255,0,0.08);
+  }
+  .community-inner { max-width: 1200px; margin: 0 auto; }
+
+  .community-header {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: end;
+    margin-bottom: 72px;
+  }
+  .community-title {
+    font-family: 'Courier New', monospace;
+    font-size: clamp(36px, 4.5vw, 72px);
+    font-weight: 400;
+    color: rgba(198,255,0,0.25);
+    line-height: 1.1;
+  }
+  .community-title span {
+    font-weight: 900;
+    color: #C6FF00;
+    text-shadow: 0 0 40px rgba(198,255,0,0.3);
+  }
+  .community-sub {
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    line-height: 1.9;
+    color: rgba(198,255,0,0.4);
+    letter-spacing: 0.03em;
+  }
+
+  .community-links {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  .comm-card {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 28px 32px;
+    border: 1px solid rgba(198,255,0,0.12);
+    background: rgba(198,255,0,0.02);
+    text-decoration: none;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .comm-card:hover {
+    border-color: rgba(198,255,0,0.4);
+    background: rgba(198,255,0,0.05);
+  }
+  .comm-icon svg {
+    width: 22px; height: 22px;
+    fill: #C6FF00;
+    opacity: 0.7;
+  }
+  .comm-card:hover .comm-icon svg { opacity: 1; }
+  .comm-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1;
+  }
+  .comm-label {
+    font-family: 'Courier New', monospace;
+    font-size: 9px;
+    letter-spacing: 0.28em;
+    color: rgba(198,255,0,0.35);
+    text-transform: uppercase;
+  }
+  .comm-handle {
+    font-family: 'Courier New', monospace;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    color: #C6FF00;
+  }
+  .comm-arrow {
+    font-family: 'Courier New', monospace;
+    font-size: 16px;
+    color: rgba(198,255,0,0.3);
+    transition: color 0.2s, transform 0.2s;
+  }
+  .comm-card:hover .comm-arrow {
+    color: #C6FF00;
+    transform: translateX(4px);
+  }
+
+  .about-quote {
+    font-family: 'Courier New', monospace;
+    font-size: 11px;
+    line-height: 1.9;
+    color: rgba(198,255,0,0.3);
+    letter-spacing: 0.06em;
+    margin-top: 36px;
+    font-style: italic;
+  }
+</style>
+</head>
+<body>
+
+<!-- Telegram Coming Soon Popup -->
+<div class="tg-popup-overlay" id="tg-popup" onclick="this.classList.remove('show')">
+  <div class="tg-popup" onclick="event.stopPropagation()">
+    <div class="tg-popup-title">Coming Soon</div>
+    <div class="tg-popup-sub">Telegram community — launching soon</div>
+    <button class="tg-popup-close" onclick="document.getElementById('tg-popup').classList.remove('show')">Close</button>
+  </div>
+</div>
+
+<!-- Fixed social buttons -->
+<a class="twitter-btn" href="#" onclick="event.preventDefault(); document.getElementById('tg-popup').classList.add('show')" style="right: 116px;">
+  <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="width:14px;height:14px;fill:#C6FF00;">
+    <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L7.26 13.808l-2.948-.924c-.64-.203-.654-.64.135-.954l11.566-4.461c.537-.194 1.006.131.881.752z"/>
+  </svg>
+</a>
+<a class="twitter-btn" href="https://x.com/Fletchhood" target="_blank">
+  <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="width:14px;height:14px;fill:#C6FF00;">
+    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.746l7.73-8.835L1.254 2.25H8.08l4.258 5.63 5.907-5.63Zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+  </svg>
+</a>
+
+<section id="hero">
+<canvas id="bg"></canvas>
+<div class="hud">
+  <!-- TL corner -->
+  <div class="corner c-tl">
+    <svg viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M2 36 L2 2 L36 2" stroke="rgba(198,255,0,0.55)" stroke-width="1" fill="none"/>
+      <circle cx="2" cy="2" r="1.5" fill="#C6FF00" opacity="0.8"/>
+      <line x1="10" y1="2" x2="10" y2="8" stroke="rgba(198,255,0,0.25)" stroke-width="0.6"/>
+      <line x1="18" y1="2" x2="18" y2="6" stroke="rgba(198,255,0,0.15)" stroke-width="0.6"/>
+      <line x1="2" y1="10" x2="8" y2="10" stroke="rgba(198,255,0,0.25)" stroke-width="0.6"/>
+      <line x1="2" y1="18" x2="6" y2="18" stroke="rgba(198,255,0,0.15)" stroke-width="0.6"/>
+      <circle cx="14" cy="14" r="1" fill="rgba(198,255,0,0.2)"/>
+      <circle cx="22" cy="8" r="0.5" fill="rgba(198,255,0,0.15)"/>
+      <circle cx="8" cy="22" r="0.5" fill="rgba(198,255,0,0.15)"/>
+      <path d="M18 18 L24 18 M18 18 L18 24" stroke="rgba(198,255,0,0.12)" stroke-width="0.5"/>
+    </svg>
+  </div>
+
+  <!-- TR corner -->
+  <div class="corner c-tr">
+    <svg viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M70 36 L70 2 L36 2" stroke="rgba(198,255,0,0.55)" stroke-width="1" fill="none"/>
+      <circle cx="70" cy="2" r="1.5" fill="#C6FF00" opacity="0.8"/>
+      <line x1="62" y1="2" x2="62" y2="8" stroke="rgba(198,255,0,0.25)" stroke-width="0.6"/>
+      <line x1="54" y1="2" x2="54" y2="6" stroke="rgba(198,255,0,0.15)" stroke-width="0.6"/>
+      <line x1="70" y1="10" x2="64" y2="10" stroke="rgba(198,255,0,0.25)" stroke-width="0.6"/>
+      <line x1="70" y1="18" x2="66" y2="18" stroke="rgba(198,255,0,0.15)" stroke-width="0.6"/>
+      <circle cx="58" cy="14" r="1" fill="rgba(198,255,0,0.2)"/>
+    </svg>
+  </div>
+
+  <!-- BL corner -->
+  <div class="corner c-bl">
+    <svg viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M2 36 L2 70 L36 70" stroke="rgba(198,255,0,0.55)" stroke-width="1" fill="none"/>
+      <circle cx="2" cy="70" r="1.5" fill="#C6FF00" opacity="0.8"/>
+      <line x1="10" y1="70" x2="10" y2="64" stroke="rgba(198,255,0,0.25)" stroke-width="0.6"/>
+      <line x1="2" y1="62" x2="8" y2="62" stroke="rgba(198,255,0,0.25)" stroke-width="0.6"/>
+    </svg>
+  </div>
+
+  <!-- BR corner -->
+  <div class="corner c-br">
+    <svg viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M70 36 L70 70 L36 70" stroke="rgba(198,255,0,0.55)" stroke-width="1" fill="none"/>
+      <circle cx="70" cy="70" r="1.5" fill="#C6FF00" opacity="0.8"/>
+      <line x1="62" y1="70" x2="62" y2="64" stroke="rgba(198,255,0,0.25)" stroke-width="0.6"/>
+      <line x1="70" y1="62" x2="64" y2="62" stroke="rgba(198,255,0,0.25)" stroke-width="0.6"/>
+      <circle cx="58" cy="58" r="1" fill="rgba(198,255,0,0.2)"/>
+    </svg>
+  </div>
+
+
+  <!-- Top center -->
+  <div class="hud-top">
+    <div class="hud-top-line"></div>
+    <div class="hud-dot"></div>
+    <span class="hud-top-text">FLETCHHOOD · ROBINHOOD CHAIN 4663</span>
+    <div class="hud-dot"></div>
+    <div class="hud-top-line r"></div>
+  </div>
+
+  <!-- CA bar -->
+  <div class="ca-bar">
+    <span class="ca-label">CA</span>
+    <span class="ca-address">TBA — Contract not yet deployed</span>
+    <button class="ca-copy" onclick="navigator.clipboard.writeText(this.previousElementSibling.textContent)">COPY</button>
+  </div>
+
+  <!-- Ticker card -->
+  <div class="ticker-card">
+    <div class="ticker-label-row">
+      <span class="ticker-label">Our Ticker</span>
+      <div class="ticker-info">
+        ?
+        <div class="ticker-tooltip">A ticker is a short symbol that identifies a token on exchanges and charts — like a name tag for trading. Ours is $FHOOD.</div>
+      </div>
+    </div>
+    <div class="ticker-value">$FHOOD</div>
+  </div>
+
+  <!-- Bottom center -->
+  <div class="hud-bot">
+    <div class="tick"></div>
+    <span>FLETCHHOOD · ROBINHOOD CHAIN 4663</span>
+    <div class="tick"></div>
+  </div>
+
+  <!-- Side strips -->
+  <div class="side-strip l"><span>FLETCHHOOD · ROBINHOOD CHAIN 4663</span></div>
+  <div class="side-strip r"><span>FLETCHHOOD · ROBINHOOD CHAIN 4663</span></div>
+
+</div>
+</section>
+
+<div id="content">
+
+  <!-- ─── About Section ─── -->
+  <section id="about">
+    <div class="about-inner">
+
+      <div class="about-label">// ABOUT</div>
+
+      <div class="about-grid">
+        <div class="about-left">
+          <h2 class="about-title">Meet<br><span>Fletchhood.</span></h2>
+          <div class="about-divider"></div>
+          <p class="about-body">
+            He is not your ordinary cat. Born in the streets with nothing but instinct and audacity,
+            Fletchhood watched the wealthy hoard their gold while the rest of the world scratched for scraps.
+          </p>
+          <p class="about-body">
+            One day, he decided enough was enough. With silent paws and sharp eyes,
+            he slipped through the cracks of every boardroom, every vault, every closed door —
+            and brought what he found back to the people.
+          </p>
+          <p class="about-body">
+            He does not ask for permission. He does not wait for the market to be fair.
+            He simply moves — and the wealth follows.
+          </p>
+          <p class="about-tagline">This is his chain. This is his coin.<br>And now — it belongs to you.</p>
+        </div>
+
+        <div class="about-right">
+          <div class="about-stat-card">
+            <span class="stat-label">CHARACTER</span>
+            <span class="stat-value">THE CAT</span>
+          </div>
+          <div class="about-stat-card">
+            <span class="stat-label">CHAIN</span>
+            <span class="stat-value">ROBINHOOD 4663</span>
+          </div>
+          <div class="about-stat-card">
+            <span class="stat-label">MISSION</span>
+            <span class="stat-value">REDISTRIBUTE WEALTH</span>
+          </div>
+          <div class="about-stat-card">
+            <span class="stat-label">WEAKNESS</span>
+            <span class="stat-value">NONE.</span>
+          </div>
+          <div class="about-quote">
+            "The boardrooms feared the banks.<br>
+            The banks feared the traders.<br>
+            The traders feared the cat."
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ─── Community Section ─── -->
+  <section id="community">
+    <div class="community-inner">
+
+      <div class="about-label">// COMMUNITY</div>
+
+      <div class="community-header">
+        <h2 class="community-title">Join the<br><span>Movement.</span></h2>
+        <p class="community-sub">Fletchhood is nothing without its people. Connect, follow, and be part of something that was built for you — not the boardrooms.</p>
+      </div>
+
+      <div class="community-links">
+
+        <a class="comm-card" href="https://x.com/Fletchhood" target="_blank">
+          <div class="comm-icon">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.746l7.73-8.835L1.254 2.25H8.08l4.258 5.63 5.907-5.63Zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+          </div>
+          <div class="comm-info">
+            <span class="comm-handle">@Fletchhood</span>
+          </div>
+          <div class="comm-arrow">→</div>
+        </a>
+
+        <a class="comm-card" href="#" target="_blank">
+          <div class="comm-icon">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L7.26 13.808l-2.948-.924c-.64-.203-.654-.64.135-.954l11.566-4.461c.537-.194 1.006.131.881.752z"/></svg>
+          </div>
+          <div class="comm-info">
+            <span class="comm-handle">Coming soon</span>
+          </div>
+          <div class="comm-arrow">→</div>
+        </a>
+
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  const canvas = document.getElementById('bg');
+  const ctx = canvas.getContext('2d');
+
+  let W = 0, H = 0, frame = 0;
+
+  // ─── Rock image ───────────────────────────────────────────────────────────
+  const rockImg = new Image();
+  let rockLoaded = false;
+  rockImg.onload = () => { rockLoaded = true; };
+  rockImg.src = 'rock2.png';
+
+  // ─── Particles ────────────────────────────────────────────────────────────
+  const MAX_PARTICLES = 220;
+  let particles = [];
+
+  function mkParticle(randomY) {
+    return {
+      x: Math.random() * W,
+      y: randomY ? Math.random() * H : H + 5,
+      vx: (Math.random() - 0.5) * 0.25,
+      vy: -(0.08 + Math.random() * 0.35),
+      r: 0.4 + Math.random() * 1.4,
+      life: 0,
+      maxLife: 180 + Math.random() * 340,
+      isLime: Math.random() < 0.28,
+    };
+  }
+
+  function initParticles() {
+    particles = [];
+    const n = Math.min(MAX_PARTICLES, Math.floor((W * H) / 7500));
+    for (let i = 0; i < n; i++) particles.push(mkParticle(true));
+  }
+
+  // ─── Resize ───────────────────────────────────────────────────────────────
+  function resize() {
+    const dpr = window.devicePixelRatio || 1;
+    const rect = canvas.parentElement.getBoundingClientRect();
+    W = rect.width;
+    H = rect.height;
+    canvas.width  = W * dpr;
+    canvas.height = H * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    initParticles();
+  }
+
+  // ─── Draw both rocks ─────────────────────────────────────────────────────
+  function drawRocks() {
+    if (!rockLoaded) return;
+
+    // Rocks meet at center forming a mountain/pyramid silhouette.
+    // Center the image on screen; left half draws left side, mirrored right side draws right.
+    const isMobile = W < 600;
+    const drawH = H * 1.55;
+    const drawW = drawH * (rockImg.naturalWidth / rockImg.naturalHeight);
+    const xOff  = (W - drawW) * 0.5;
+    const yPos  = H - drawH * 0.82;
+
+    function drawOneSide() {
+      ctx.drawImage(rockImg, xOff, yPos, drawW, drawH);
+
+      // Top fade — removes grey sky
+      const topFade = ctx.createLinearGradient(0, yPos, 0, yPos + drawH * 0.52);
+      topFade.addColorStop(0,    '#050505');
+      topFade.addColorStop(0.38, 'rgba(5,5,5,0.82)');
+      topFade.addColorStop(0.68, 'rgba(5,5,5,0.15)');
+      topFade.addColorStop(1,    'rgba(5,5,5,0)');
+      ctx.fillStyle = topFade;
+      ctx.fillRect(xOff, yPos, drawW, drawH * 0.52);
+
+
+      // Outer edge fade — fades toward left screen edge
+      const outerEnd   = Math.max(0, xOff);
+      const outerStart = outerEnd + W * 0.16;
+      const fg = ctx.createLinearGradient(outerEnd, 0, outerStart, 0);
+      fg.addColorStop(0, 'rgba(5,5,5,1)');
+      fg.addColorStop(1, 'rgba(5,5,5,0)');
+      ctx.fillStyle = fg;
+      ctx.fillRect(0, 0, outerStart + 1, H);
+    }
+
+    // ── Left half ──
+    ctx.save();
+    ctx.beginPath(); ctx.rect(0, 0, W * 0.5, H); ctx.clip();
+    drawOneSide();
+    ctx.restore();
+
+    // ── Right half (mirror) ──
+    ctx.save();
+    ctx.translate(W, 0); ctx.scale(-1, 1);
+    ctx.beginPath(); ctx.rect(0, 0, W * 0.5, H); ctx.clip();
+    drawOneSide();
+    ctx.restore();
+  }
+
+  // ─── Draw ─────────────────────────────────────────────────────────────────
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+
+    const horizonY = H * 0.24;
+    const breath = 0.75 + 0.25 * Math.sin(frame * 0.006);
+
+    // ── Sky ────────────────────────────────────────────────────────────────
+    const skyG = ctx.createLinearGradient(0, 0, 0, H);
+    skyG.addColorStop(0,   '#020202');
+    skyG.addColorStop(0.4, '#040404');
+    skyG.addColorStop(0.7, '#060705');
+    skyG.addColorStop(1,   '#080a05');
+    ctx.fillStyle = skyG;
+    ctx.fillRect(0, 0, W, H);
+
+    // ── Stars ─────────────────────────────────────────────────────────────
+    if (!draw._stars) {
+      draw._stars = Array.from({ length: 55 }, (_, i) => ({
+        x: ((i * 137.508 + 13) % 1) * W,
+        y: (((i * 97.3 + 7.7) % 1)) * H * 0.52,
+        s: 0.4 + ((i * 31 % 10) / 10) * 0.8,
+        a: 0.08 + ((i * 53 % 10) / 10) * 0.18,
+      }));
+    } else {
+      draw._stars.forEach((s, i) => {
+        s.x = ((i * 137.508 + 13) % 1) * W;
+        s.y = (((i * 97.3 + 7.7) % 1)) * H * 0.52;
+      });
+    }
+    ctx.save();
+    draw._stars.forEach(s => {
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.s, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(200,210,190,${s.a * (0.7 + 0.3 * Math.sin(frame * 0.008 + s.x))})`;
+      ctx.fill();
+    });
+    ctx.restore();
+
+    // ── Hero title (drawn before rocks so rock appears in front) ──────────
+    (function drawHeroTitle() {
+      const text = 'FLETCHHOOD';
+      // Auto-fit font size so text spans ~88% of screen width
+      let fontSize = 10;
+      ctx.font = `900 ${fontSize}px 'Courier New', monospace`;
+      const targetW = W * 0.68;
+      fontSize = Math.floor(fontSize * targetW / ctx.measureText(text).width);
+      ctx.font = `900 ${fontSize}px 'Courier New', monospace`;
+
+      const textY = H * 0.30;
+      const cx = W / 2;
+
+      // Glow layers
+      ctx.save();
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.globalCompositeOperation = 'source-over';
+
+      // Outer glow
+      ctx.shadowColor = '#C6FF00';
+      ctx.shadowBlur = 80;
+      ctx.fillStyle = 'rgba(198,255,0,0.3)';
+      ctx.fillText(text, cx, textY);
+
+      ctx.shadowBlur = 40;
+      ctx.fillStyle = 'rgba(198,255,0,0.5)';
+      ctx.fillText(text, cx, textY);
+
+      // Main text — neon lime
+      ctx.shadowBlur = 15;
+      ctx.fillStyle = '#C6FF00';
+      ctx.fillText(text, cx, textY);
+
+      ctx.restore();
+
+      // ── Neon divider line below title ─────────────────────────────────
+      const lineY    = textY + fontSize * 0.72;
+      const lineW    = W * 0.38;
+      const pulse    = 0.7 + 0.3 * Math.sin(frame * 0.02);
+      const lineAlpha = 0.55 * pulse;
+
+      ctx.save();
+      // Left half
+      const lg = ctx.createLinearGradient(cx - lineW, lineY, cx, lineY);
+      lg.addColorStop(0,   'rgba(198,255,0,0)');
+      lg.addColorStop(0.6, `rgba(198,255,0,${lineAlpha})`);
+      lg.addColorStop(1,   `rgba(198,255,0,${lineAlpha * 1.4})`);
+      ctx.strokeStyle = lg;
+      ctx.lineWidth = 1;
+      ctx.shadowColor = '#C6FF00';
+      ctx.shadowBlur = 8;
+      ctx.beginPath();
+      ctx.moveTo(cx - lineW, lineY);
+      ctx.lineTo(cx - fontSize * 0.3, lineY);
+      ctx.stroke();
+
+      // Right half
+      const rg = ctx.createLinearGradient(cx, lineY, cx + lineW, lineY);
+      rg.addColorStop(0,   `rgba(198,255,0,${lineAlpha * 1.4})`);
+      rg.addColorStop(0.4, `rgba(198,255,0,${lineAlpha})`);
+      rg.addColorStop(1,   'rgba(198,255,0,0)');
+      ctx.strokeStyle = rg;
+      ctx.beginPath();
+      ctx.moveTo(cx + fontSize * 0.3, lineY);
+      ctx.lineTo(cx + lineW, lineY);
+      ctx.stroke();
+
+      // Center dot
+      ctx.shadowBlur = 12;
+      ctx.fillStyle = '#C6FF00';
+      ctx.globalAlpha = pulse;
+      ctx.beginPath();
+      ctx.arc(cx, lineY, 2, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    })();
+
+
+    // ── Rock terrain (real image) ─────────────────────────────────────────
+    drawRocks();
+
+
+
+
+// ── Neon lime rim light — thin tint on rock ridge only ───────────────
+    // Use low-opacity source-over so it doesn't bleed onto dark sky
+    ctx.save();
+    ctx.globalAlpha = 0.12 * breath;
+    // Left: horizontal gradient fading inward
+    const rimL = ctx.createLinearGradient(0, 0, W * 0.38, 0);
+    rimL.addColorStop(0,   'rgba(198,255,0,0.22)');
+    rimL.addColorStop(0.6, 'rgba(198,255,0,0.06)');
+    rimL.addColorStop(1,   'transparent');
+    ctx.fillStyle = rimL;
+    ctx.fillRect(0, H * 0.25, W * 0.38, H * 0.65);
+    // Right: mirror
+    const rimR = ctx.createLinearGradient(W, 0, W * 0.62, 0);
+    rimR.addColorStop(0,   'rgba(198,255,0,0.22)');
+    rimR.addColorStop(0.6, 'rgba(198,255,0,0.06)');
+    rimR.addColorStop(1,   'transparent');
+    ctx.fillStyle = rimR;
+    ctx.fillRect(W * 0.62, H * 0.25, W * 0.38, H * 0.65);
+    ctx.restore();
+
+    // ── Contour lines over rocks (screen blend → only visible on lit rock) ─
+    ctx.save();
+    ctx.globalCompositeOperation = 'screen';
+    const contourCount = 32;
+    for (let c = 0; c < contourCount; c++) {
+      const frac = c / (contourCount - 1);
+      const targetY = H * 0.2 + frac * H * 0.72;
+      const lPulse = 0.5 + 0.5 * Math.sin(frame * 0.005 + c * 0.18);
+      const rPulse = 0.5 + 0.5 * Math.sin(frame * 0.005 + c * 0.18 + 1.2);
+      const baseOp = (1 - frac) * 0.07 + 0.008;
+      const lw = c % 5 === 0 ? 0.8 : 0.35;
+
+      // Left contour: fades from left edge toward center
+      const lw2 = W * 0.48;
+      const lgL = ctx.createLinearGradient(0, 0, lw2, 0);
+      lgL.addColorStop(0,   `rgba(198,255,0,${baseOp * lPulse})`);
+      lgL.addColorStop(0.65,`rgba(198,255,0,${baseOp * lPulse * 0.4})`);
+      lgL.addColorStop(1,   'transparent');
+      ctx.strokeStyle = lgL;
+      ctx.lineWidth = lw;
+      ctx.beginPath(); ctx.moveTo(0, targetY); ctx.lineTo(lw2, targetY); ctx.stroke();
+
+      // Right contour: mirror
+      const lgR = ctx.createLinearGradient(W, 0, W - lw2, 0);
+      lgR.addColorStop(0,   `rgba(198,255,0,${baseOp * rPulse})`);
+      lgR.addColorStop(0.65,`rgba(198,255,0,${baseOp * rPulse * 0.4})`);
+      lgR.addColorStop(1,   'transparent');
+      ctx.strokeStyle = lgR;
+      ctx.beginPath(); ctx.moveTo(W, targetY); ctx.lineTo(W - lw2, targetY); ctx.stroke();
+    }
+    ctx.restore();
+
+    // ── Atmospheric fog ───────────────────────────────────────────────────
+    const fogBase = H * 0.62;
+    const fogG = ctx.createLinearGradient(0, fogBase, 0, H * 0.88);
+    fogG.addColorStop(0,   'transparent');
+    fogG.addColorStop(0.3, 'rgba(5,7,3,0.15)');
+    fogG.addColorStop(0.7, 'rgba(4,5,3,0.38)');
+    fogG.addColorStop(1,   'rgba(3,4,2,0.6)');
+    ctx.fillStyle = fogG;
+    ctx.fillRect(0, fogBase, W, H - fogBase);
+
+    for (let f = 0; f < 6; f++) {
+      const fy = H * (0.66 + f * 0.033);
+      const drift = Math.sin(frame * 0.0009 * (f % 2 === 0 ? 1 : -1) + f * 1.7) * W * 0.04;
+      const wG = ctx.createRadialGradient(W*.5+drift, fy, 0, W*.5+drift, fy, W*(0.38+f*0.04));
+      wG.addColorStop(0, `rgba(5,7,3,${0.12+f*0.015})`);
+      wG.addColorStop(0.6, 'rgba(4,5,3,0.04)');
+      wG.addColorStop(1, 'transparent');
+      ctx.fillStyle = wG;
+      ctx.fillRect(0, fy-60, W, 120);
+    }
+
+    // ── Particles ─────────────────────────────────────────────────────────
+    const targetCount = Math.min(MAX_PARTICLES, Math.floor((W * H) / 7500));
+    while (particles.length < targetCount) particles.push(mkParticle(true));
+
+    ctx.save();
+    for (let i = particles.length - 1; i >= 0; i--) {
+      const p = particles[i];
+      p.x += p.vx; p.y += p.vy; p.life++;
+      if (p.life > p.maxLife || p.y < -5) { particles[i] = mkParticle(false); continue; }
+      const alpha = Math.sin((p.life / p.maxLife) * Math.PI) * (p.isLime ? 0.75 : 0.35);
+      if (p.isLime) {
+        ctx.shadowBlur = 8; ctx.shadowColor = 'rgba(198,255,0,0.6)';
+        ctx.fillStyle = `rgba(198,255,0,${alpha})`;
+      } else {
+        ctx.shadowBlur = 0;
+        ctx.fillStyle = `rgba(160,175,130,${alpha * 0.5})`;
+      }
+      ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI*2); ctx.fill();
+    }
+    ctx.shadowBlur = 0;
+    ctx.restore();
+
+    // ── Vignette ──────────────────────────────────────────────────────────
+    const vigG = ctx.createRadialGradient(W*.5, H*.5, H*.2, W*.5, H*.5, H*.9);
+    vigG.addColorStop(0,   'transparent');
+    vigG.addColorStop(0.6, 'rgba(2,2,2,0.15)');
+    vigG.addColorStop(1,   'rgba(1,1,1,0.82)');
+    ctx.fillStyle = vigG;
+    ctx.fillRect(0, 0, W, H);
+
+    const edgeG = ctx.createLinearGradient(0, 0, W, 0);
+    edgeG.addColorStop(0,    'rgba(2,2,2,0.55)');
+    edgeG.addColorStop(0.1,  'transparent');
+    edgeG.addColorStop(0.9,  'transparent');
+    edgeG.addColorStop(1,    'rgba(2,2,2,0.55)');
+    ctx.fillStyle = edgeG;
+    ctx.fillRect(0, 0, W, H);
+
+    ctx.save();
+    ctx.globalAlpha = 0.012;
+    for (let sy = 0; sy < H; sy += 2) { ctx.fillStyle='#000'; ctx.fillRect(0,sy,W,1); }
+    ctx.restore();
+
+    // ── Subtitle headline — mixed weight typography ────────────────────────
+    (function drawSubtitle() {
+      const x  = W * 0.05;
+      const isMobile = W < 600;
+      const sm = Math.max(isMobile ? 7 : 0, Math.floor(W * 0.011));   // small grey size
+      const lg = Math.max(isMobile ? 10 : 0, Math.floor(W * 0.017));  // large white bold size
+      const lh = lg * 1.18;               // line height based on large size
+      const lime = '#C6FF00';
+      const font = "'Courier New', monospace";
+
+      ctx.save();
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'alphabetic';
+      ctx.shadowColor = 'rgba(198,255,0,0.5)';
+      ctx.shadowBlur = 10;
+
+      const y0 = H * 0.72;
+
+      // Line 1: "MEMECOIN FOR " small + "THE NEXT" large bold
+      ctx.font = `400 ${sm}px ${font}`;
+      ctx.fillStyle = lime;
+      ctx.fillText('MEMECOIN FOR ', x, y0);
+      const off = ctx.measureText('MEMECOIN FOR ').width;
+      ctx.font = `700 ${lg}px ${font}`;
+      ctx.fillText('THE NEXT', x + off, y0);
+
+      // Line 2: "GENERATION OF TRADERS." — bold large
+      ctx.font = `700 ${lg}px ${font}`;
+      ctx.fillStyle = lime;
+      ctx.fillText('GENERATION OF TRADERS.', x, y0 + lh);
+
+      ctx.restore();
+
+      // ── Right side tagline ──
+      ctx.save();
+      ctx.textAlign = isMobile ? 'right' : 'left';
+      ctx.textBaseline = 'alphabetic';
+      ctx.shadowColor = 'rgba(198,255,0,0.5)';
+      ctx.shadowBlur = 10;
+
+      const rx = isMobile ? W * 0.95 : W * 0.76;
+
+      // Line 1: "Forged on the belief that" — small, dim
+      ctx.font = `400 ${sm}px ${font}`;
+      ctx.fillStyle = lime;
+      ctx.globalAlpha = 0.65;
+      ctx.fillText('Forged on the belief that', rx, y0);
+
+      // Line 2: "belongs to WEALTH" — bold large
+      ctx.font = `700 ${lg}px ${font}`;
+      ctx.fillStyle = lime;
+      ctx.globalAlpha = 1.0;
+      ctx.fillText('belongs to WEALTH', rx, y0 + lh);
+
+      // Line 3: "NOT THE BOARDROOMS." — bold large
+      ctx.fillText('NOT THE BOARDROOMS.', rx, y0 + lh * 2);
+
+      ctx.restore();
+    })();
+
+    frame++;
+    requestAnimationFrame(draw);
+  }
+
+  // ─── Init ─────────────────────────────────────────────────────────────────
+  // Mouse tracking for coin follow effect
+  let mouseX = 0, mouseY = 0;
+  let coinX = 0, coinY = 0;
+  window.addEventListener('mousemove', e => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+  });
+
+  window.addEventListener('resize', () => {
+    // Ignore height-only changes caused by mobile address bar hide/show
+    if (canvas.parentElement.getBoundingClientRect().width === W) return;
+    draw._stars = null;
+    resize();
+  });
+  resize();
+  draw();
+})();
+</script>
+
+</body>
+</html>
