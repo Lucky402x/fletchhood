@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="virtual-protocol-site-verification" content="0a9dc54e8050ffc28c5838e83e807579" />
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="apple-touch-icon" href="favicon.png">
 <title>FLETCHHOOD &mdash; The Memecoin for the Next Generation of Traders</title>
 <style>
   *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
@@ -146,7 +149,7 @@
   .twitter-btn {
     position: fixed;
     top: 22px;
-    right: 72px;
+    right: 112px;
     z-index: 100;
     pointer-events: all;
     display: flex;
@@ -160,6 +163,7 @@
     cursor: pointer;
     transition: border-color 0.2s, background 0.2s;
   }
+  .twitter-btn.btn-tg { right: 156px; }
   .twitter-btn:hover {
     border-color: rgba(198,255,0,0.7);
     background: rgba(198,255,0,0.08);
@@ -174,55 +178,6 @@
     white-space: nowrap;
   }
   .twitter-btn:hover span { color: #C6FF00; }
-
-  /* ─── Telegram popup ─── */
-  .tg-popup-overlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    z-index: 999;
-    background: rgba(0,0,0,0.6);
-    backdrop-filter: blur(4px);
-    align-items: center;
-    justify-content: center;
-  }
-  .tg-popup-overlay.show { display: flex; }
-  .tg-popup {
-    border: 1px solid rgba(198,255,0,0.25);
-    background: rgba(5,5,5,0.92);
-    padding: 40px 56px;
-    text-align: center;
-  }
-  .tg-popup-title {
-    font-family: 'Courier New', monospace;
-    font-size: 22px;
-    font-weight: 900;
-    color: #C6FF00;
-    letter-spacing: 0.12em;
-    text-shadow: 0 0 30px rgba(198,255,0,0.4);
-    margin-bottom: 10px;
-  }
-  .tg-popup-sub {
-    font-family: 'Courier New', monospace;
-    font-size: 10px;
-    letter-spacing: 0.22em;
-    color: rgba(198,255,0,0.4);
-    text-transform: uppercase;
-    margin-bottom: 28px;
-  }
-  .tg-popup-close {
-    font-family: 'Courier New', monospace;
-    font-size: 9px;
-    letter-spacing: 0.2em;
-    color: rgba(198,255,0,0.35);
-    text-transform: uppercase;
-    background: none;
-    border: 1px solid rgba(198,255,0,0.2);
-    padding: 7px 20px;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-  .tg-popup-close:hover { color: #C6FF00; border-color: rgba(198,255,0,0.6); }
 
   /* ─── CA bar ─── */
   .ca-bar {
@@ -338,44 +293,12 @@
   }
   .ticker-value {
     font-family: 'Courier New', monospace;
-    font-size: clamp(48px, 6vw, 80px);
+    font-size: clamp(30px, 4.2vw, 52px);
     font-weight: 900;
     color: #C6FF00;
     letter-spacing: 0.04em;
     line-height: 1;
     text-shadow: 0 0 30px rgba(198,255,0,0.4);
-  }
-
-  /* ─── Mobile responsive ─── */
-  @media (max-width: 768px) {
-    #about { padding: 60px 24px 60px; }
-    #community { padding: 60px 24px 80px; }
-
-    .about-grid { grid-template-columns: 1fr; gap: 40px; }
-    .community-header { grid-template-columns: 1fr; gap: 24px; margin-bottom: 40px; }
-    .community-links { grid-template-columns: 1fr; gap: 12px; }
-
-    .about-title { font-size: clamp(28px, 8vw, 48px); }
-    .community-title { font-size: clamp(28px, 8vw, 48px); }
-
-    .ca-bar { width: 90%; padding: 10px 14px; }
-    .ca-address { font-size: 9px; }
-
-    #hero { height: 540px; }
-    .ca-bar { top: 52%; width: 90%; padding: 10px 14px; }
-    .ticker-card { padding: 12px 20px 14px; bottom: 40px; }
-    .ticker-value { font-size: clamp(36px, 10vw, 60px); }
-    .c-tl, .c-tr, .c-bl, .c-br { width: 44px; height: 44px; }
-    .c-tl, .c-tr { top: 14px; }
-    .c-tl, .c-bl { left: 14px; }
-    .c-tr, .c-br { right: 14px; }
-    .c-bl, .c-br { bottom: 14px; }
-    .hud-bot { bottom: 14px; }
-
-    .hud-top-text { font-size: 6px; letter-spacing: 0.14em; }
-    .side-strip { display: none; }
-
-    .comm-card { padding: 20px 20px; }
   }
 
   /* ─── About section ─── */
@@ -524,6 +447,22 @@
     border-color: rgba(198,255,0,0.4);
     background: rgba(198,255,0,0.05);
   }
+  /* Primary "Buy" CTA — filled lime, spans the full row */
+  .comm-card.primary {
+    grid-column: 1 / -1;
+    background: #C6FF00;
+    border-color: #C6FF00;
+    box-shadow: 0 0 40px rgba(198,255,0,0.25);
+  }
+  .comm-card.primary:hover {
+    background: #d4ff33;
+    border-color: #d4ff33;
+    box-shadow: 0 0 60px rgba(198,255,0,0.45);
+  }
+  .comm-card.primary .comm-icon svg { fill: #050505; opacity: 1; }
+  .comm-card.primary .comm-label { color: rgba(5,5,5,0.55); }
+  .comm-card.primary .comm-handle { color: #050505; }
+  .comm-card.primary .comm-arrow { color: #050505; }
   .comm-icon svg {
     width: 22px; height: 22px;
     fill: #C6FF00;
@@ -570,21 +509,47 @@
     margin-top: 36px;
     font-style: italic;
   }
+
+  /* ─── Mobile responsive (placed last so it overrides base rules) ─── */
+  @media (max-width: 768px) {
+    #about { padding: 60px 24px 60px; }
+    #community { padding: 60px 24px 80px; }
+
+    .about-grid { grid-template-columns: 1fr; gap: 40px; }
+    .community-header { grid-template-columns: 1fr; gap: 24px; margin-bottom: 40px; }
+    .community-links { grid-template-columns: 1fr; gap: 12px; }
+
+    .about-title { font-size: clamp(28px, 8vw, 48px); }
+    .community-title { font-size: clamp(28px, 8vw, 48px); }
+
+    .ca-address { font-size: 9px; }
+
+    #hero { height: 540px; }
+    .ca-bar { top: 52%; width: 90%; padding: 10px 14px; }
+    .ticker-card { padding: 12px 20px 14px; bottom: 80px; }
+    .ticker-value { font-size: clamp(22px, 6.4vw, 38px); }
+    .c-tl, .c-tr, .c-bl, .c-br { width: 44px; height: 44px; }
+    .c-tl, .c-tr { top: 14px; }
+    .c-tl, .c-bl { left: 14px; }
+    .c-tr, .c-br { right: 14px; }
+    .c-bl, .c-br { bottom: 14px; }
+    .hud-bot { bottom: 14px; }
+
+    /* Hide the top-center HUD text so the social buttons sit cleanly
+       in the top-right corner without overlapping it */
+    .hud-top { display: none; }
+    .twitter-btn { right: 66px; }
+    .twitter-btn.btn-tg { right: 110px; }
+    .side-strip { display: none; }
+
+    .comm-card { padding: 20px 20px; }
+  }
 </style>
 </head>
 <body>
 
-<!-- Telegram Coming Soon Popup -->
-<div class="tg-popup-overlay" id="tg-popup" onclick="this.classList.remove('show')">
-  <div class="tg-popup" onclick="event.stopPropagation()">
-    <div class="tg-popup-title">Coming Soon</div>
-    <div class="tg-popup-sub">Telegram community — launching soon</div>
-    <button class="tg-popup-close" onclick="document.getElementById('tg-popup').classList.remove('show')">Close</button>
-  </div>
-</div>
-
 <!-- Fixed social buttons -->
-<a class="twitter-btn" href="#" onclick="event.preventDefault(); document.getElementById('tg-popup').classList.add('show')" style="right: 116px;">
+<a class="twitter-btn btn-tg" href="https://t.me/FLETCHHOODR" target="_blank">
   <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="width:14px;height:14px;fill:#C6FF00;">
     <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L7.26 13.808l-2.948-.924c-.64-.203-.654-.64.135-.954l11.566-4.461c.537-.194 1.006.131.881.752z"/>
   </svg>
@@ -661,8 +626,8 @@
   <!-- CA bar -->
   <div class="ca-bar">
     <span class="ca-label">CA</span>
-    <span class="ca-address">TBA — Contract not yet deployed</span>
-    <button class="ca-copy" onclick="navigator.clipboard.writeText(this.previousElementSibling.textContent)">COPY</button>
+    <span class="ca-address">0x5bb35d229a57fe1887cb27960422851769b6f36e</span>
+    <button class="ca-copy" onclick="navigator.clipboard.writeText(this.previousElementSibling.textContent); var b=this; b.textContent='COPIED'; setTimeout(function(){b.textContent='COPY';}, 1500);">COPY</button>
   </div>
 
   <!-- Ticker card -->
@@ -671,10 +636,10 @@
       <span class="ticker-label">Our Ticker</span>
       <div class="ticker-info">
         ?
-        <div class="ticker-tooltip">A ticker is a short symbol that identifies a token on exchanges and charts — like a name tag for trading. Ours is $FHOOD.</div>
+        <div class="ticker-tooltip">A ticker is a short symbol that identifies a token on exchanges and charts — like a name tag for trading. Ours is $FLETCHHOOD.</div>
       </div>
     </div>
-    <div class="ticker-value">$FHOOD</div>
+    <div class="ticker-value">$FLETCHHOOD</div>
   </div>
 
   <!-- Bottom center -->
@@ -760,6 +725,16 @@
 
       <div class="community-links">
 
+        <div class="comm-card primary">
+          <div class="comm-icon">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M13 2 3 14h7l-1 8 10-12h-7l1-8z"/></svg>
+          </div>
+          <div class="comm-info">
+            <span class="comm-label">Trade</span>
+            <span class="comm-handle">Buy $FLETCHHOOD</span>
+          </div>
+        </div>
+
         <a class="comm-card" href="https://x.com/Fletchhood" target="_blank">
           <div class="comm-icon">
             <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.746l7.73-8.835L1.254 2.25H8.08l4.258 5.63 5.907-5.63Zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
@@ -770,12 +745,12 @@
           <div class="comm-arrow">→</div>
         </a>
 
-        <a class="comm-card" href="#" target="_blank">
+        <a class="comm-card" href="https://t.me/FLETCHHOODR" target="_blank">
           <div class="comm-icon">
             <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L7.26 13.808l-2.948-.924c-.64-.203-.654-.64.135-.954l11.566-4.461c.537-.194 1.006.131.881.752z"/></svg>
           </div>
           <div class="comm-info">
-            <span class="comm-handle">Coming soon</span>
+            <span class="comm-handle">@FLETCHHOODR</span>
           </div>
           <div class="comm-arrow">→</div>
         </a>
@@ -842,7 +817,6 @@
 
     // Rocks meet at center forming a mountain/pyramid silhouette.
     // Center the image on screen; left half draws left side, mirrored right side draws right.
-    const isMobile = W < 600;
     const drawH = H * 1.55;
     const drawW = drawH * (rockImg.naturalWidth / rockImg.naturalHeight);
     const xOff  = (W - drawW) * 0.5;
@@ -1128,7 +1102,7 @@
     // ── Subtitle headline — mixed weight typography ────────────────────────
     (function drawSubtitle() {
       const x  = W * 0.05;
-      const isMobile = W < 600;
+      const isMobile = W < 768;   // match the CSS mobile breakpoint
       const sm = Math.max(isMobile ? 7 : 0, Math.floor(W * 0.011));   // small grey size
       const lg = Math.max(isMobile ? 10 : 0, Math.floor(W * 0.017));  // large white bold size
       const lh = lg * 1.18;               // line height based on large size
@@ -1141,20 +1115,26 @@
       ctx.shadowColor = 'rgba(198,255,0,0.5)';
       ctx.shadowBlur = 10;
 
-      const y0 = H * 0.72;
+      // On mobile the ticker card sits near the bottom, so lift the
+      // taglines up to just below the CA bar to avoid overlapping it.
+      const y0 = H * (isMobile ? 0.58 : 0.72);
+      // The right tagline has 3 lines and the left has 2. On mobile,
+      // push the left block down by one line so both blocks share the
+      // same bottom baseline (they line up evenly).
+      const ly = y0 + (isMobile ? lh : 0);
 
       // Line 1: "MEMECOIN FOR " small + "THE NEXT" large bold
       ctx.font = `400 ${sm}px ${font}`;
       ctx.fillStyle = lime;
-      ctx.fillText('MEMECOIN FOR ', x, y0);
+      ctx.fillText('MEMECOIN FOR ', x, ly);
       const off = ctx.measureText('MEMECOIN FOR ').width;
       ctx.font = `700 ${lg}px ${font}`;
-      ctx.fillText('THE NEXT', x + off, y0);
+      ctx.fillText('THE NEXT', x + off, ly);
 
       // Line 2: "GENERATION OF TRADERS." — bold large
       ctx.font = `700 ${lg}px ${font}`;
       ctx.fillStyle = lime;
-      ctx.fillText('GENERATION OF TRADERS.', x, y0 + lh);
+      ctx.fillText('GENERATION OF TRADERS.', x, ly + lh);
 
       ctx.restore();
 
